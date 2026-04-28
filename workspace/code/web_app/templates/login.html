@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 | SAR-光学图像配准系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="auth-body">
+    <main class="auth-shell">
+        <section class="auth-hero">
+            <p class="eyebrow">Image Registration Studio</p>
+            <h1>进入你的配准工作台</h1>
+            <p class="hero-copy">
+                这个版本将登录入口、模型配准主界面、历史任务和日志追踪彻底拆开了。
+                先登录，再进入分区更清晰的控制台，避免所有功能都挤在同一页。
+            </p>
+
+            <div class="hero-points">
+                <div class="hero-point">
+                    <strong>独立登录页</strong>
+                    <span>认证入口单独存在，页面职责更清晰。</span>
+                </div>
+                <div class="hero-point">
+                    <strong>模型驱动配准</strong>
+                    <span>统一通过 CNN 模型执行推理，便于与你的论文目标保持一致。</span>
+                </div>
+                <div class="hero-point">
+                    <strong>结果可追踪</strong>
+                    <span>历史任务、日志和结果回看都会保留，更适合中期和答辩展示。</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="auth-panel">
+            <div class="auth-card">
+                <div class="auth-tabs">
+                    <button id="login-tab" class="auth-tab active" type="button">登录</button>
+                    <button id="register-tab" class="auth-tab" type="button">注册</button>
+                </div>
+
+                <div class="auth-form">
+                    <label class="field-label" for="username-input">用户名</label>
+                    <input id="username-input" class="field-input" type="text" placeholder="请输入用户名">
+
+                    <label class="field-label" for="password-input">密码</label>
+                    <input id="password-input" class="field-input" type="password" placeholder="请输入密码">
+
+                    <p id="auth-hint" class="auth-hint">输入现有账号后登录，或切换到注册创建新账号。</p>
+
+                    <button id="auth-submit" class="primary-button" type="button">登录并进入系统</button>
+                </div>
+
+                <div id="auth-message" class="auth-message hidden"></div>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

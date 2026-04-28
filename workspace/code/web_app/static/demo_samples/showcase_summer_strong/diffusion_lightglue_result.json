@@ -1,0 +1,123 @@
+{
+  "success": true,
+  "method": "diffusion_lightglue",
+  "model_info": {
+    "generator_checkpoint": "E:\\checkPoint\\checkPoint\\checkpoint-25001-lcm-adv\\model.safetensors",
+    "device": "cuda",
+    "dtype": "float16",
+    "steps": 8,
+    "max_keypoints": 2048,
+    "extractor": "superpoint",
+    "extractor_policy": "cascade",
+    "extractors": [
+      "superpoint",
+      "aliked"
+    ],
+    "match_preprocess": "rgb"
+  },
+  "timings": {
+    "generation_ms": 2270.6,
+    "registration_ms": 1157.45,
+    "total_ms": 3436.06
+  },
+  "metrics": {
+    "prediction_type": "sar_via_fakeoptical_lightglue_homography",
+    "extractor": "superpoint",
+    "match_count": 640,
+    "matches_total": 640,
+    "matches_used": 640,
+    "correct_matches": 438,
+    "inliers": 438,
+    "inlier_ratio": 0.6844,
+    "mean_score": 0.376401,
+    "rmse": 1.8228,
+    "registration_reliable": true,
+    "reliability_reasons": [],
+    "dx": -1.409,
+    "dy": -0.2309,
+    "h_matrix": [
+      [
+        0.996633,
+        -0.001337,
+        -1.409013
+      ],
+      [
+        -0.006794,
+        0.993805,
+        -0.230894
+      ],
+      [
+        -3.9e-05,
+        -2.7e-05,
+        1.0
+      ]
+    ],
+    "poor_spatial_coverage": false,
+    "bad_homography_shape": false,
+    "coverage0": 0.963231,
+    "coverage1": 0.962275,
+    "quadrants0": 4,
+    "quadrants1": 4,
+    "area_ratio": 1.008084,
+    "max_corner_shift_ratio": 0.005537,
+    "reliability_rule": "reliable iff inliers >= 8, inlier_ratio >= 0.25, rmse <= 5px, spatial coverage is sufficient, homography shape is plausible",
+    "difference_mean": 62.416,
+    "geometry_source": "Fake Optical -> Real Optical",
+    "geometry_applied_to": "SAR -> Real Optical",
+    "point_transfer": "Fake Optical keypoints are reused as SAR coordinates because Fake Optical is generated pixel-aligned from the resized SAR condition.",
+    "max_keypoints": 2048,
+    "selected_extractor": "superpoint",
+    "extractor_policy": "cascade",
+    "extractors_tried": [
+      "superpoint",
+      "aliked"
+    ],
+    "match_preprocess": "rgb",
+    "cascade_rescued": false,
+    "matcher_candidates": [
+      {
+        "extractor": "superpoint",
+        "elapsed_ms": 535.91,
+        "error": "",
+        "match_count": 640,
+        "inliers": 438,
+        "inlier_ratio": 0.6844,
+        "rmse": 1.8228,
+        "registration_reliable": true,
+        "reliability_reasons": [],
+        "poor_spatial_coverage": false,
+        "bad_homography_shape": false
+      },
+      {
+        "extractor": "aliked",
+        "elapsed_ms": 466.91,
+        "error": "",
+        "match_count": 49,
+        "inliers": 16,
+        "inlier_ratio": 0.3265,
+        "rmse": 1.7413,
+        "registration_reliable": true,
+        "reliability_reasons": [],
+        "poor_spatial_coverage": false,
+        "bad_homography_shape": false
+      }
+    ],
+    "generator_steps": 8
+  },
+  "artifacts": {
+    "fake_optical": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\fake_optical.png",
+    "sar_condition": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\sar_condition.png",
+    "real_optical": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\real_optical_resized.png",
+    "matches": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\lightglue_matches.png",
+    "sar_transferred_matches": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\sar_transferred_matches.png",
+    "optical_transferred_points": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\optical_transferred_points.png",
+    "fake_registered": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\fake_optical_registered.png",
+    "sar_registered": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\sar_registered.png",
+    "registered_preview": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\sar_registered.png",
+    "download": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\registered_output.png",
+    "checkerboard": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\checkerboard.png",
+    "overlay": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\false_color_overlay.png",
+    "difference": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\difference_map.png",
+    "contour": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\runs\\coarse\\strategy_cascade-superpoint_aliked-rgb_steps_8_keypoints_2048\\0086_ROIs1868_summer_148_p252\\contour_overlay.png"
+  }
+}

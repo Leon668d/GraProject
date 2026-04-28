@@ -1,0 +1,46 @@
+{
+  "input_count": 6157,
+  "kept_count": 4042,
+  "rejected_count": 2115,
+  "kept_ratio": 0.656489,
+  "thresholds": {
+    "min_edge": 14.0,
+    "min_std": 18.0,
+    "max_water": 0.35,
+    "min_sar_edge": 5.0,
+    "min_sar_std": 4.0,
+    "metric_size": 256,
+    "water_sample_size": 48
+  },
+  "by_season": {
+    "fall": {
+      "input": 1864,
+      "kept": 1220,
+      "rejected": 644
+    },
+    "spring": {
+      "input": 1462,
+      "kept": 1078,
+      "rejected": 384
+    },
+    "summer": {
+      "input": 1236,
+      "kept": 767,
+      "rejected": 469
+    },
+    "winter": {
+      "input": 1595,
+      "kept": 977,
+      "rejected": 618
+    }
+  },
+  "rejection_reasons": {
+    "low_texture": 1415,
+    "sar_low_texture": 98,
+    "water_like": 844
+  },
+  "outputs": {
+    "filtered_pairs_csv": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_param_sweep\\filtered_pairs.csv",
+    "rejected_pairs_csv": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_param_sweep\\rejected_pairs.csv"
+  }
+}

@@ -1,0 +1,18 @@
+# Runtime data
+workspace/code/web_app/uploads/
+workspace/code/web_app/results/
+workspace/code/web_app/logs/
+workspace/code/web_app/runtime_cache/
+workspace/code/web_app/app_data.db
+
+# Python cache
+**/__pycache__/
+*.pyc
+
+# Model weights
+*.pth
+*.safetensors
+
+# Local editor/system files
+.DS_Store
+Thumbs.db

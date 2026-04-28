@@ -1,0 +1,97 @@
+{
+  "success": true,
+  "best_params": {
+    "matcher_strategy": "cascade-superpoint+aliked-rgb",
+    "extractor": "cascade-superpoint+aliked-rgb",
+    "extractor_policy": "cascade",
+    "match_preprocess": "rgb",
+    "steps": 8,
+    "max_keypoints": 2048
+  },
+  "selection_phase": "coarse",
+  "selection_rule": "max success_rate, then min median_rmse_reliable, then max median_inlier_ratio, then min median_total_ms",
+  "best_summary": {
+    "phase": "coarse",
+    "matcher_strategy": "cascade-superpoint+aliked-rgb",
+    "extractor": "cascade-superpoint+aliked-rgb",
+    "extractor_policy": "cascade",
+    "match_preprocess": "rgb",
+    "selected_extractor_counts": "{\"aliked\": 43, \"superpoint\": 57}",
+    "steps": 8,
+    "max_keypoints": 2048,
+    "n": 100,
+    "worker_success_count": 100,
+    "worker_failure_count": 0,
+    "worker_success_rate": 1.0,
+    "reliable_count": 45,
+    "success_rate": 0.45,
+    "median_rmse_reliable": 1.8127,
+    "median_rmse_all": 1.5126,
+    "median_inliers": 10.5,
+    "median_inlier_ratio": 0.28285,
+    "median_match_count": 55.5,
+    "median_total_ms": 3457.105,
+    "fail_few_inliers": 30,
+    "fail_low_inlier_ratio": 37,
+    "fail_high_rmse": 0,
+    "poor_spatial_coverage_count": 4,
+    "bad_homography_count": 33,
+    "cascade_rescued_count": 15
+  },
+  "inputs": {
+    "pairs_csv": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_param_sweep\\filtered_pairs.csv",
+    "checkpoint": "E:\\checkPoint\\checkPoint\\checkpoint-25001-lcm-adv\\model.safetensors",
+    "coarse_limit": 100,
+    "verify_limit": 0,
+    "steps": [
+      8
+    ],
+    "keypoints": [
+      2048
+    ],
+    "extractors": [
+      "superpoint"
+    ],
+    "extractor_policies": [
+      "single"
+    ],
+    "match_preprocesses": [
+      "rgb"
+    ],
+    "strategy_preset": "cascade-study"
+  },
+  "outputs": {
+    "all_runs_csv": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\all_runs.csv",
+    "summary_by_params_csv": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\summary_by_params.csv",
+    "paper_table_md": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\paper_table.md",
+    "failure_contact_sheets": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\failure_contact_sheets"
+  },
+  "contact_sheet": {
+    "success": true,
+    "all_runs_csv": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\all_runs.csv",
+    "failure_count": 257,
+    "by_reason": {
+      "bad_homography_shape": 13,
+      "few_inliers": 138,
+      "low_inlier_ratio": 100,
+      "poor_spatial_coverage": 6
+    },
+    "by_extractor": {
+      "aliked": 68,
+      "superpoint": 66,
+      "superpoint+aliked": 123
+    },
+    "cascade_rescued_count": 24,
+    "outputs": {
+      "all": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\failure_contact_sheets\\failures_all.png",
+      "reason:bad_homography_shape": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\failure_contact_sheets\\failures_reason_bad_homography_shape.png",
+      "reason:few_inliers": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\failure_contact_sheets\\failures_reason_few_inliers.png",
+      "reason:low_inlier_ratio": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\failure_contact_sheets\\failures_reason_low_inlier_ratio.png",
+      "reason:poor_spatial_coverage": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\failure_contact_sheets\\failures_reason_poor_spatial_coverage.png",
+      "extractor:aliked": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\failure_contact_sheets\\failures_extractor_aliked.png",
+      "extractor:superpoint": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\failure_contact_sheets\\failures_extractor_superpoint.png",
+      "extractor:superpoint+aliked": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\failure_contact_sheets\\failures_extractor_superpoint+aliked.png",
+      "cascade_rescued": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_cascade_study_100\\failure_contact_sheets\\cascade_rescued.png"
+    }
+  }
+}

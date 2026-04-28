@@ -1,0 +1,151 @@
+<section id="result-stage" class="panel-card result-panel research-result-stage">
+    <div class="panel-head result-stage-head">
+        <div>
+            <p class="eyebrow">Execution & Quality Gate</p>
+            <h2>配准结果</h2>
+            <p id="result-context">已内置稳定样例。也可以上传自定义图像，执行扩散生成与 LightGlue 配准。</p>
+        </div>
+        <div class="quality-thresholds">
+            <span>inliers >= 8</span>
+            <span>ratio >= 0.25</span>
+            <span>RMSE <= 5px</span>
+        </div>
+    </div>
+
+    <div id="loading" class="loading-state hidden">
+        <div class="loading-ring"></div>
+        <p>正在执行扩散生成、LightGlue 匹配和几何验证，请稍候...</p>
+    </div>
+
+    <div id="demo-empty-state" class="demo-empty-state">
+        <strong>正在加载默认演示样例</strong>
+        <p>页面会优先展示一组已生成的稳定结果，不依赖 GPU 推理，适合现场讲解。</p>
+    </div>
+
+    <div id="results" class="results-stack hidden">
+        <section id="registration-quality" class="quality-banner hidden"></section>
+
+        <section class="summary-grid result-kpi-grid" id="timing-summary"></section>
+
+        <section class="decision-grid">
+            <article class="detail-card decision-card">
+                <h3>配准指标</h3>
+                <div id="metric-details" class="detail-list"></div>
+            </article>
+            <article class="detail-card decision-card">
+                <h3>耗时统计</h3>
+                <div id="timing-details" class="detail-list"></div>
+            </article>
+        </section>
+
+        <section class="result-viewer" aria-label="result image viewer">
+            <article class="image-card featured-image-card">
+                <div class="featured-image-head">
+                    <div>
+                        <h3 id="featured-title">SAR 配准后</h3>
+                        <p id="featured-caption">主图展示当前最关键的配准结果，可点击放大查看。</p>
+                    </div>
+                    <span class="viewer-hint">点击图片放大</span>
+                </div>
+                <div class="safe-image-frame">
+                    <img id="featured-img" alt="主结果图">
+                    <div class="image-placeholder hidden">图像暂未生成</div>
+                </div>
+            </article>
+            <div id="result-thumbnail-strip" class="result-thumbnail-strip" aria-label="result thumbnails"></div>
+        </section>
+
+        <section class="result-tabs" aria-label="result tabs">
+            <button class="tab-button active" type="button" data-tab-target="tab-overview">结果总览</button>
+            <button class="tab-button" type="button" data-tab-target="tab-matches">匹配证据</button>
+            <button class="tab-button" type="button" data-tab-target="tab-diagnostics">复核图</button>
+            <button class="tab-button" type="button" data-tab-target="tab-artifacts">中间产物</button>
+        </section>
+
+        <section id="tab-overview" class="tab-panel active">
+            <div class="gallery-grid evidence-gallery compact-gallery">
+                <article class="image-card primary-image-card" id="registered-preview-card">
+                    <h3>SAR 配准后</h3>
+                    <p>根据 Fake Optical 与真实光学的匹配单应矩阵，将同坐标 SAR 图像对齐到真实光学。</p>
+                    <img id="registered-preview-img" alt="配准后的 SAR 图">
+                </article>
+                <article class="image-card">
+                    <h3>棋盘格对比</h3>
+                    <p>交替显示真实光学图与配准后的 SAR 图，边界越平滑，说明局部对齐越稳定。</p>
+                    <img id="checkerboard-img" alt="棋盘格对比图">
+                </article>
+                <article class="image-card">
+                    <h3>伪彩色融合</h3>
+                    <p>白灰色重合区域越多，说明整体结构越接近对齐。</p>
+                    <img id="overlay-img" alt="伪彩色融合图">
+                </article>
+            </div>
+        </section>
+
+        <section id="tab-matches" class="tab-panel">
+            <div id="match-evidence" class="gallery-grid evidence-gallery compact-gallery">
+                <article class="image-card hidden" id="fake-optical-card">
+                    <h3>Fake Optical</h3>
+                    <p>扩散模型从 SAR 生成的伪光学图，是 LightGlue 的输入图之一。</p>
+                    <img id="fake-optical-img" alt="扩散生成伪光学图">
+                </article>
+                <article class="image-card hidden" id="lightglue-match-card">
+                    <h3>LightGlue 匹配</h3>
+                    <p>Fake Optical 与真实光学的匹配线，用于估计 Homography。</p>
+                    <img id="lightglue-match-img" alt="LightGlue 匹配可视化">
+                </article>
+                <article class="image-card hidden" id="sar-transfer-match-card">
+                    <h3>SAR 对应点迁移</h3>
+                    <p>将 Fake Optical 上的匹配点按像素同坐标关系迁移回 SAR。</p>
+                    <img id="sar-transfer-match-img" alt="SAR 对应点迁移可视化">
+                </article>
+                <article class="image-card hidden" id="optical-points-card">
+                    <h3>真实光学叠加对应点</h3>
+                    <p>只在真实光学图上显示迁移后的对应点，绿色代表 RANSAC 内点。</p>
+                    <img id="optical-points-img" alt="真实光学对应点叠加图">
+                </article>
+            </div>
+        </section>
+
+        <section id="tab-diagnostics" class="tab-panel">
+            <div class="gallery-grid evidence-gallery compact-gallery">
+                <article class="image-card">
+                    <h3>差分图像</h3>
+                    <p>亮区表示结构偏差仍较明显，暗区表示更接近对齐。</p>
+                    <img id="difference-img" alt="差分图像">
+                </article>
+                <article class="image-card">
+                    <h3>轮廓叠加</h3>
+                    <p>红绿轮廓越接近重合，说明形状边界越一致。</p>
+                    <img id="contour-img" alt="轮廓叠加图">
+                </article>
+                <article class="image-card hidden" id="deformation-card">
+                    <h3>形变场热力图</h3>
+                    <p>亮色区域代表位移幅值更大，可用于观察非刚性配准稳定性。</p>
+                    <img id="deformation-img" alt="形变场热力图">
+                </article>
+            </div>
+        </section>
+
+        <section id="tab-artifacts" class="tab-panel">
+            <div class="gallery-grid evidence-gallery artifact-gallery">
+                <article class="image-card hidden" id="sar-condition-card">
+                    <h3>SAR 输入图</h3>
+                    <p>待配准的源图像，也是扩散生成 Fake Optical 的条件输入。</p>
+                    <img id="sar-condition-img" alt="SAR 输入图">
+                </article>
+                <article class="image-card hidden" id="real-optical-card">
+                    <h3>真实光学图</h3>
+                    <p>目标参考图像，用于 LightGlue 匹配和最终对齐评估。</p>
+                    <img id="real-optical-img" alt="真实光学图">
+                </article>
+            </div>
+            <div class="evidence-note">
+                <strong>结果解释</strong>
+                <p>Fake Optical 只作为跨模态桥梁。最终需要的是 SAR 到真实光学的配准，所以页面同时展示 Fake 上的匹配证据和 SAR 上的点迁移结果。</p>
+            </div>
+        </section>
+
+        <button id="download-button" class="secondary-button" type="button">下载配准结果</button>
+    </div>
+</section>

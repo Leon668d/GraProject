@@ -1,0 +1,13 @@
+file,sar_path,opt_path,checkpoint_loaded,steps
+0000_ROIs1158_spring_136_p330.png,/mnt/e/Data/spring/s1_136/ROIs1158_spring_s1_136_p330.png,/mnt/e/Data/spring/s2_136/ROIs1158_spring_s2_136_p330.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16
+0001_ROIs1158_spring_3_p637.png,/mnt/e/Data/spring/s1_3/ROIs1158_spring_s1_3_p637.png,/mnt/e/Data/spring/s2_3/ROIs1158_spring_s2_3_p637.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16
+0002_ROIs1158_spring_143_p1068.png,/mnt/e/Data/spring/s1_143/ROIs1158_spring_s1_143_p1068.png,/mnt/e/Data/spring/s2_143/ROIs1158_spring_s2_143_p1068.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16
+0003_ROIs1158_spring_98_p376.png,/mnt/e/Data/spring/s1_98/ROIs1158_spring_s1_98_p376.png,/mnt/e/Data/spring/s2_98/ROIs1158_spring_s2_98_p376.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16
+0004_ROIs1158_spring_54_p898.png,/mnt/e/Data/spring/s1_54/ROIs1158_spring_s1_54_p898.png,/mnt/e/Data/spring/s2_54/ROIs1158_spring_s2_54_p898.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16
+0005_ROIs1158_spring_110_p79.png,/mnt/e/Data/spring/s1_110/ROIs1158_spring_s1_110_p79.png,/mnt/e/Data/spring/s2_110/ROIs1158_spring_s2_110_p79.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16
+0006_ROIs1158_spring_83_p323.png,/mnt/e/Data/spring/s1_83/ROIs1158_spring_s1_83_p323.png,/mnt/e/Data/spring/s2_83/ROIs1158_spring_s2_83_p323.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16
+0007_ROIs1158_spring_52_p352.png,/mnt/e/Data/spring/s1_52/ROIs1158_spring_s1_52_p352.png,/mnt/e/Data/spring/s2_52/ROIs1158_spring_s2_52_p352.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16
+0008_ROIs1158_spring_79_p845.png,/mnt/e/Data/spring/s1_79/ROIs1158_spring_s1_79_p845.png,/mnt/e/Data/spring/s2_79/ROIs1158_spring_s2_79_p845.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16
+0009_ROIs1158_spring_23_p1029.png,/mnt/e/Data/spring/s1_23/ROIs1158_spring_s1_23_p1029.png,/mnt/e/Data/spring/s2_23/ROIs1158_spring_s2_23_p1029.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16
+0010_ROIs1158_spring_80_p448.png,/mnt/e/Data/spring/s1_80/ROIs1158_spring_s1_80_p448.png,/mnt/e/Data/spring/s2_80/ROIs1158_spring_s2_80_p448.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16
+0011_ROIs1158_spring_3_p284.png,/mnt/e/Data/spring/s1_3/ROIs1158_spring_s1_3_p284.png,/mnt/e/Data/spring/s2_3/ROIs1158_spring_s2_3_p284.png,/mnt/e/checkPoint/checkPoint/checkpoint-25001-lcm-adv/model.safetensors,16

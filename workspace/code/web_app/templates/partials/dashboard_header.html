@@ -1,0 +1,72 @@
+<header class="topbar research-topbar">
+    <div class="hero-title-block">
+        <p class="eyebrow">Diffusion Registration Research Console</p>
+        <h1>扩散生成 + LightGlue 跨模态配准实验平台</h1>
+        <p class="hero-subtitle">
+            面向答辩演示的跨模态配准控制台：SAR 生成 Fake Optical，LightGlue 估计几何关系，
+            再将 SAR 对齐到真实光学图像。
+        </p>
+    </div>
+    <div class="topbar-actions">
+        <div class="user-chip">
+            <span class="user-chip-label">当前用户</span>
+            <strong id="user-status">{{ current_user.username }}</strong>
+        </div>
+        <button id="logout-button" class="ghost-button" type="button">退出登录</button>
+    </div>
+</header>
+
+<nav class="dashboard-nav" aria-label="dashboard sections">
+    <a href="#quick-demo">快速演示</a>
+    <a href="#result-stage">推理结果</a>
+    <a href="#match-evidence">匹配证据</a>
+    <a href="#experiment-evidence">实验依据</a>
+    <a href="#system-records">系统记录</a>
+</nav>
+
+<section class="method-flow" aria-label="pipeline">
+    <article>
+        <span>01</span>
+        <strong>SAR 输入</strong>
+        <p>Sentinel-1 或同源 SAR 图像作为待配准源图。</p>
+    </article>
+    <article>
+        <span>02</span>
+        <strong>Fake Optical</strong>
+        <p>ACD_S2ODPM 预训练生成器执行跨模态翻译。</p>
+    </article>
+    <article>
+        <span>03</span>
+        <strong>Cascade Matching</strong>
+        <p>SuperPoint 优先，必要时 ALIKED 接力，LightGlue 输出对应点。</p>
+    </article>
+    <article>
+        <span>04</span>
+        <strong>Geometry Gate</strong>
+        <p>按内点、内点率、RMSE、空间覆盖和 Homography 形状判断可靠性。</p>
+    </article>
+    <article>
+        <span>05</span>
+        <strong>SAR Warp</strong>
+        <p>把 Fake Optical 上的对应关系迁移回 SAR，生成配准结果。</p>
+    </article>
+</section>
+
+<section class="overview-grid research-overview">
+    <article class="overview-card">
+        <span class="overview-label">模型状态</span>
+        <strong id="model-status">检测中...</strong>
+    </article>
+    <article class="overview-card">
+        <span class="overview-label">运行设备</span>
+        <strong id="device-status">检测中...</strong>
+    </article>
+    <article class="overview-card">
+        <span class="overview-label">系统模式</span>
+        <strong id="method-status">检测中...</strong>
+    </article>
+    <article class="overview-card current-best-card">
+        <span class="overview-label">当前最优配置</span>
+        <strong id="current-model-status">8 steps / 2048 kp / cascade</strong>
+    </article>
+</section>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>研究控制台 | SAR-光学图像配准系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_console.css') }}">
+</head>
+<body class="dashboard-body research-console-body" data-username="{{ current_user.username }}">
+    <div class="dashboard-shell research-console-shell">
+        {% include "partials/dashboard_header.html" %}
+
+        <main class="research-console-grid">
+            {% include "partials/dashboard_control_panel.html" %}
+
+            <section class="research-main">
+                {% include "partials/dashboard_result_stage.html" %}
+                {% include "partials/dashboard_evidence_panel.html" %}
+                {% include "partials/dashboard_records_panel.html" %}
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

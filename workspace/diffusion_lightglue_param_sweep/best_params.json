@@ -1,0 +1,50 @@
+{
+  "success": true,
+  "best_params": {
+    "steps": 8,
+    "max_keypoints": 2048
+  },
+  "selection_phase": "verify",
+  "selection_rule": "max success_rate, then min median_rmse_reliable, then max median_inlier_ratio, then min median_total_ms",
+  "best_summary": {
+    "phase": "verify",
+    "steps": 8,
+    "max_keypoints": 2048,
+    "n": 100,
+    "worker_success_count": 100,
+    "worker_failure_count": 0,
+    "worker_success_rate": 1.0,
+    "reliable_count": 39,
+    "success_rate": 0.39,
+    "median_rmse_reliable": 1.8335,
+    "median_rmse_all": 1.5127,
+    "median_inliers": 10.0,
+    "median_inlier_ratio": 0.23765,
+    "median_match_count": 68.5,
+    "median_total_ms": 2114.035,
+    "fail_few_inliers": 33,
+    "fail_low_inlier_ratio": 54,
+    "fail_high_rmse": 0
+  },
+  "inputs": {
+    "pairs_csv": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_param_sweep\\filtered_pairs.csv",
+    "checkpoint": "E:\\checkPoint\\checkPoint\\checkpoint-25001-lcm-adv\\model.safetensors",
+    "coarse_limit": 50,
+    "verify_limit": 100,
+    "steps": [
+      6,
+      8,
+      12
+    ],
+    "keypoints": [
+      512,
+      1024,
+      2048
+    ]
+  },
+  "outputs": {
+    "all_runs_csv": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_param_sweep\\all_runs.csv",
+    "summary_by_params_csv": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_param_sweep\\summary_by_params.csv",
+    "paper_table_md": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\diffusion_lightglue_param_sweep\\paper_table.md"
+  }
+}

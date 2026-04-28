@@ -1,0 +1,111 @@
+<section id="experiment-evidence" class="panel-card experiment-evidence-panel">
+    <div class="panel-head baseline-head">
+        <div>
+            <p class="eyebrow">Experiment Evidence</p>
+            <h2>参数搜索与消融证据</h2>
+            <p>这里保留参数搜索、matcher 对比、级联接力和边界案例统计，用来支撑当前默认参数选择。</p>
+        </div>
+        <span id="experiment-summary-status" class="baseline-status-pill">读取中...</span>
+    </div>
+
+    <section class="summary-grid experiment-best-grid" id="experiment-best-cards">
+        <article class="summary-card">
+            <span>当前结论</span>
+            <strong>加载中...</strong>
+        </article>
+    </section>
+
+    <details class="evidence-details" open>
+        <summary>核心实验依据</summary>
+        <div class="experiment-split-grid">
+        <article class="baseline-table-card">
+            <h3>100 对过滤样本上的 matcher 对比</h3>
+            <div id="experiment-strategy-table" class="baseline-table">
+                <div class="empty-block">正在读取 cascade study 结果...</div>
+            </div>
+            <div class="history-actions baseline-actions">
+                <a id="experiment-download-summary" class="history-action detail-link-button hidden" href="#" target="_blank">下载汇总 CSV</a>
+                <a id="experiment-download-all-runs" class="history-action detail-link-button hidden" href="#" target="_blank">下载 all_runs CSV</a>
+                <a id="experiment-download-paper-table" class="history-action detail-link-button hidden" href="#" target="_blank">下载论文表格</a>
+            </div>
+        </article>
+
+        <article class="baseline-table-card">
+            <h3>样本质量过滤</h3>
+            <div id="filter-summary-grid" class="filter-summary-grid">
+                <div class="empty-block">正在读取 filtered_pairs 统计...</div>
+            </div>
+            <div class="history-actions baseline-actions">
+                <a id="experiment-download-filtered" class="history-action detail-link-button hidden" href="#" target="_blank">下载 filtered_pairs</a>
+                <a id="experiment-download-rejected" class="history-action detail-link-button hidden" href="#" target="_blank">下载 rejected_pairs</a>
+            </div>
+        </article>
+        </div>
+    </details>
+
+    <details class="evidence-details">
+        <summary>边界案例与级联接力样例</summary>
+        <div class="experiment-split-grid">
+        <article class="image-card baseline-preview-card hidden">
+            <h3>级联补救样本</h3>
+            <p>展示 SuperPoint 结果待复核、ALIKED 接力后通过质量门控的样本，用于说明级联策略的贡献。</p>
+            <img id="experiment-cascade-rescued" alt="级联补救样例预览">
+        </article>
+        <article class="image-card baseline-preview-card hidden">
+            <h3>边界案例分析</h3>
+            <p>集中展示质量门控拦截的代表性样例，用于说明几何复核机制的必要性。</p>
+            <img id="experiment-failures-all" alt="边界案例预览">
+        </article>
+        </div>
+    </details>
+
+    <details class="legacy-baseline-details">
+        <summary>预训练生成器 baseline 文件状态</summary>
+        <div class="legacy-baseline-body">
+            <div class="baseline-head compact-baseline-head">
+                <div>
+                    <h3>预训练生成器配准实验线</h3>
+                    <p>用于检查 ACD_S2ODPM LCM_ADV 预训练生成器是否可作为当前最优生成器基线。</p>
+                </div>
+                <span id="diffusion-baseline-status" class="baseline-status-pill">读取中...</span>
+            </div>
+
+            <div class="baseline-meta-grid">
+                <article class="baseline-meta-card">
+                    <span>生成器权重</span>
+                    <strong id="diffusion-generator-name">--</strong>
+                    <code id="diffusion-generator-path">--</code>
+                </article>
+                <article class="baseline-meta-card">
+                    <span>实验结论</span>
+                    <strong>预训练权重作为当前最优生成器基线</strong>
+                    <p>短步数本地微调已停止，不再使用 EMA251 / EMA501 / EMA751 作为主线。</p>
+                </article>
+            </div>
+
+            <section class="summary-grid baseline-metric-grid" id="diffusion-baseline-metrics">
+                <article class="summary-card">
+                    <span>LightGlue 指标</span>
+                    <strong>加载中...</strong>
+                </article>
+            </section>
+
+            <div class="baseline-preview-grid">
+                <article class="image-card baseline-preview-card hidden">
+                    <h3>预训练生成样例对比</h3>
+                    <img id="diffusion-contact-sheet" alt="预训练生成器样例对比图">
+                </article>
+                <article class="baseline-table-card">
+                    <h3>LightGlue 样例记录</h3>
+                    <div id="diffusion-sample-table" class="baseline-table">
+                        <div class="empty-block">正在读取 LightGlue 评估 CSV...</div>
+                    </div>
+                    <div class="history-actions baseline-actions">
+                        <a id="diffusion-download-metrics" class="history-action detail-link-button hidden" href="#" target="_blank">下载指标 CSV</a>
+                        <a id="diffusion-download-manifest" class="history-action detail-link-button hidden" href="#" target="_blank">下载样本 Manifest</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </details>
+</section>

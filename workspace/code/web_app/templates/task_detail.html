@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史任务详情 | SAR-光学图像配准系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="dashboard-body" data-session-id="{{ session_id }}">
+    <div class="detail-shell">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Task Detail</p>
+                <h1>历史配准详情</h1>
+            </div>
+            <div class="topbar-actions">
+                <div class="user-chip">
+                    <span class="user-chip-label">当前用户</span>
+                    <strong>{{ current_user.username }}</strong>
+                </div>
+                <a class="ghost-button back-link" href="/dashboard">返回控制台</a>
+            </div>
+        </header>
+
+        <section class="panel-card detail-hero">
+            <div>
+                <h2 id="detail-title">正在加载任务详情...</h2>
+                <p id="detail-subtitle">这里会展示该历史任务的完整配准结果、耗时统计与全部指标。</p>
+            </div>
+            <div class="detail-badges" id="detail-badges"></div>
+        </section>
+
+        <section class="summary-grid" id="detail-summary"></section>
+
+        <section class="detail-page-grid">
+            <article class="detail-card">
+                <h3>耗时统计</h3>
+                <div id="detail-timings" class="detail-list"></div>
+            </article>
+            <article class="detail-card">
+                <h3>完整指标</h3>
+                <div id="detail-metrics" class="detail-list"></div>
+            </article>
+        </section>
+
+        <section class="panel-card">
+            <div class="panel-head">
+                <h2>结果图集</h2>
+                <p>集中展示该历史任务的核心可视化结果，便于单次任务复盘和答辩展示。</p>
+            </div>
+            <section class="gallery-grid detail-gallery">
+                <article class="image-card">
+                    <h3>棋盘格对比</h3>
+                    <img id="detail-checkerboard" alt="棋盘格对比图">
+                </article>
+                <article class="image-card">
+                    <h3>伪彩色融合</h3>
+                    <img id="detail-overlay" alt="伪彩色融合图">
+                </article>
+                <article class="image-card">
+                    <h3>差分图像</h3>
+                    <img id="detail-difference" alt="差分图像">
+                </article>
+                <article class="image-card">
+                    <h3>轮廓叠加</h3>
+                    <img id="detail-contour" alt="轮廓叠加图">
+                </article>
+                <article class="image-card hidden" id="detail-deformation-card">
+                    <h3>形变场热力图</h3>
+                    <img id="detail-deformation" alt="形变场热力图">
+                </article>
+            </section>
+        </section>
+
+        <section class="panel-card">
+            <div class="panel-head">
+                <h2>任务操作</h2>
+                <p>可以直接下载该次配准结果，或返回控制台继续处理其他任务。</p>
+            </div>
+            <div class="history-actions">
+                <a id="detail-download" class="secondary-button detail-link-button" href="#" target="_blank" rel="noopener noreferrer">下载配准结果</a>
+                <a class="ghost-button back-link" href="/dashboard">返回控制台</a>
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/task_detail.js') }}"></script>
+</body>
+</html>

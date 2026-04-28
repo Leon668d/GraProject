@@ -1,0 +1,96 @@
+<aside id="quick-demo" class="control-rail">
+    <section class="panel-card control-card">
+        <div class="panel-head">
+            <p class="eyebrow">Experiment Setup</p>
+            <h2>当前配置</h2>
+            <p>默认使用预训练扩散生成器与 SuperPoint -> ALIKED 级联匹配，优先服务现场演示稳定性。</p>
+        </div>
+
+        <div class="model-static-card compact-model-card">
+            <span>生成器权重</span>
+            <strong>ACD_LCM_ADV:model.safetensors</strong>
+            <code>E:\checkPoint\checkPoint\checkpoint-25001-lcm-adv\model.safetensors</code>
+        </div>
+
+        <div class="preset-grid">
+            <article>
+                <span>默认步数</span>
+                <strong>8</strong>
+            </article>
+            <article>
+                <span>特征点</span>
+                <strong>2048</strong>
+            </article>
+            <article>
+                <span>Matcher</span>
+                <strong>SP -> ALIKED</strong>
+            </article>
+        </div>
+
+        <div class="field-row">
+            <label class="field-label" for="diffusion-steps">扩散步数</label>
+            <input id="diffusion-steps" class="field-input" type="number" min="1" max="50" value="8">
+        </div>
+
+        <div class="field-row">
+            <label class="field-label" for="lightglue-keypoints">LightGlue 特征点</label>
+            <input id="lightglue-keypoints" class="field-input" type="number" min="128" max="4096" value="2048">
+        </div>
+
+        <div class="tip-box">
+            <strong>质量门控</strong>
+            <span>页面优先显示内点数、内点率、RMSE 和最终采用的 matcher；完整诊断收纳在复核区。</span>
+        </div>
+    </section>
+
+    <section class="panel-card control-card demo-sample-card">
+        <div class="panel-head">
+            <p class="eyebrow">Built-in Demo</p>
+            <h2>快速演示样例</h2>
+            <p>打开页面后会自动加载第一个稳定样例，也可以手动切换其他代表性样例。</p>
+        </div>
+
+        <div id="demo-sample-list" class="demo-sample-list">
+            <div class="empty-block">正在读取内置样例...</div>
+        </div>
+
+        <details class="demo-review-details">
+            <summary>技术复核样例</summary>
+            <div id="demo-review-list" class="demo-sample-list compact">
+                <div class="empty-block">正在读取复核样例...</div>
+            </div>
+        </details>
+    </section>
+
+    <section class="panel-card control-card">
+        <div class="panel-head">
+            <p class="eyebrow">Input Pair</p>
+            <h2>自定义图像实验</h2>
+            <p>需要验证新图像时，上传 SAR 与真实光学图像并执行完整推理链路。</p>
+        </div>
+
+        <div class="upload-card">
+            <label class="upload-area" id="sar-upload" for="sar-input">
+                <span class="upload-tag">SAR</span>
+                <strong>SAR 图像</strong>
+                <span>支持 `.tif`、`.tiff`、`.npy`、`.jpg`、`.png`</span>
+            </label>
+            <input id="sar-input" class="hidden-input" type="file" accept=".tif,.tiff,.npy,.jpg,.jpeg,.png">
+            <div id="sar-info" class="file-info hidden"></div>
+        </div>
+
+        <div class="upload-card">
+            <label class="upload-area" id="optical-upload" for="optical-input">
+                <span class="upload-tag">OPT</span>
+                <strong>真实光学图像</strong>
+                <span>支持 `.tif`、`.tiff`、`.jpg`、`.png`</span>
+            </label>
+            <input id="optical-input" class="hidden-input" type="file" accept=".tif,.tiff,.jpg,.jpeg,.png">
+            <div id="optical-info" class="file-info hidden"></div>
+        </div>
+
+        <button id="diffusion-register-btn" class="primary-button full-width-button" type="button" disabled>
+            开始扩散 + LightGlue 配准
+        </button>
+    </section>
+</aside>
