@@ -32,6 +32,7 @@ async function registerDiffusionImages() {
                 extractor_policy: "cascade",
                 extractors: ["superpoint", "aliked"],
                 match_preprocess: "rgb",
+                resize_mode: document.getElementById("resize-mode").value || "stretch",
             }),
         });
 

@@ -37,6 +37,14 @@
             <input id="lightglue-keypoints" class="field-input" type="number" min="128" max="4096" value="2048">
         </div>
 
+        <div class="field-row">
+            <label class="field-label" for="resize-mode">尺度处理</label>
+            <select id="resize-mode" class="field-input">
+                <option value="stretch" selected>硬缩放</option>
+                <option value="letterbox">等比例补边</option>
+            </select>
+        </div>
+
         <div class="tip-box">
             <strong>质量门控</strong>
             <span>页面优先显示内点数、内点率、RMSE 和最终采用的 matcher；完整诊断收纳在复核区。</span>

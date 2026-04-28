@@ -59,6 +59,7 @@ DIFFUSION_DEFAULT_MAX_KEYPOINTS = int(os.environ.get("DIFFUSION_DEFAULT_MAX_KEYP
 DIFFUSION_DEFAULT_EXTRACTOR_POLICY = os.environ.get("DIFFUSION_DEFAULT_EXTRACTOR_POLICY", "cascade")
 DIFFUSION_DEFAULT_EXTRACTORS = os.environ.get("DIFFUSION_DEFAULT_EXTRACTORS", "superpoint aliked").split()
 DIFFUSION_DEFAULT_MATCH_PREPROCESS = os.environ.get("DIFFUSION_DEFAULT_MATCH_PREPROCESS", "rgb")
+DIFFUSION_DEFAULT_RESIZE_MODE = os.environ.get("DIFFUSION_DEFAULT_RESIZE_MODE", "stretch")
 DIFFUSION_TIMEOUT_SECONDS = int(os.environ.get("DIFFUSION_TIMEOUT_SECONDS", "900"))
 DIFFUSION_TORCH_HOME = BASE_DIR / "runtime_cache" / "torch"
 UNSUPPORTED_MODEL_KEYWORDS = ("complex",)
@@ -699,12 +700,32 @@ def user_owns_session(session_id: str, current_user: dict | None = None) -> bool
 
 def build_preview_urls(session_id: str) -> dict:
     result_dir = RESULTS_FOLDER / session_id
-    download_name = "registered_output.png" if (result_dir / "registered_output.png").exists() else "registered_output.tif"
+    download_name = (
+        "registered_output_original.png"
+        if (result_dir / "registered_output_original.png").exists()
+        else ("registered_output.png" if (result_dir / "registered_output.png").exists() else "registered_output.tif")
+    )
     return {
-        "checkerboard": f"/api/results/{session_id}/checkerboard.png",
-        "overlay": f"/api/results/{session_id}/false_color_overlay.png",
-        "difference": f"/api/results/{session_id}/difference_map.png",
-        "contour": f"/api/results/{session_id}/contour_overlay.png",
+        "checkerboard": (
+            f"/api/results/{session_id}/checkerboard_original.png"
+            if (result_dir / "checkerboard_original.png").exists()
+            else f"/api/results/{session_id}/checkerboard.png"
+        ),
+        "overlay": (
+            f"/api/results/{session_id}/false_color_overlay_original.png"
+            if (result_dir / "false_color_overlay_original.png").exists()
+            else f"/api/results/{session_id}/false_color_overlay.png"
+        ),
+        "difference": (
+            f"/api/results/{session_id}/difference_map_original.png"
+            if (result_dir / "difference_map_original.png").exists()
+            else f"/api/results/{session_id}/difference_map.png"
+        ),
+        "contour": (
+            f"/api/results/{session_id}/contour_overlay_original.png"
+            if (result_dir / "contour_overlay_original.png").exists()
+            else f"/api/results/{session_id}/contour_overlay.png"
+        ),
         "deformation": (
             f"/api/results/{session_id}/deformation_heatmap.png"
             if (result_dir / "deformation_heatmap.png").exists()
@@ -736,11 +757,16 @@ def build_preview_urls(session_id: str) -> dict:
             else None
         ),
         "sar_registered": (
-            f"/api/results/{session_id}/sar_registered.png"
-            if (result_dir / "sar_registered.png").exists()
-            else None
+            f"/api/results/{session_id}/sar_registered_original.png"
+            if (result_dir / "sar_registered_original.png").exists()
+            else (f"/api/results/{session_id}/sar_registered.png" if (result_dir / "sar_registered.png").exists() else None)
         ),
         "registered_preview": (
+            f"/api/results/{session_id}/sar_registered_original.png"
+            if (result_dir / "sar_registered_original.png").exists()
+            else (f"/api/results/{session_id}/sar_registered.png" if (result_dir / "sar_registered.png").exists() else None)
+        ),
+        "sar_registered_canvas": (
             f"/api/results/{session_id}/sar_registered.png"
             if (result_dir / "sar_registered.png").exists()
             else None
@@ -1613,9 +1639,8 @@ def register_diffusion_lightglue(
     extractor_policy: str = DIFFUSION_DEFAULT_EXTRACTOR_POLICY,
     extractors: list[str] | None = None,
     match_preprocess: str = DIFFUSION_DEFAULT_MATCH_PREPROCESS,
+    resize_mode: str = DIFFUSION_DEFAULT_RESIZE_MODE,
 ) -> dict:
-    # Boundary between Flask request handling and the external
-    # diffusion + LightGlue worker process.
     if not DIFFUSION_WORKER_SCRIPT.exists():
         raise FileNotFoundError(f"未找到扩散推理 worker: {DIFFUSION_WORKER_SCRIPT}")
     if not DIFFUSION_BASELINE_CHECKPOINT.exists():
@@ -1627,6 +1652,7 @@ def register_diffusion_lightglue(
     requested_extractors = extractors or DIFFUSION_DEFAULT_EXTRACTORS or ["superpoint"]
     requested_extractors = [item for item in requested_extractors if item in {"superpoint", "disk", "aliked"}] or ["superpoint"]
     requested_preprocess = match_preprocess if match_preprocess in {"rgb", "structure"} else DIFFUSION_DEFAULT_MATCH_PREPROCESS
+    requested_resize_mode = resize_mode if resize_mode in {"stretch", "letterbox"} else DIFFUSION_DEFAULT_RESIZE_MODE
 
     command = [
         str(DIFFUSION_RUNTIME_PYTHON),
@@ -1649,6 +1675,8 @@ def register_diffusion_lightglue(
         requested_policy,
         "--match-preprocess",
         requested_preprocess,
+        "--resize-mode",
+        requested_resize_mode,
         "--extractors",
         *requested_extractors,
     ]
@@ -1993,8 +2021,6 @@ def register_images():
 
 @app.route("/api/diffusion-register", methods=["POST"])
 def diffusion_register_images():
-    # Online inference endpoint: validate the uploaded pair, run the registration
-    # pipeline, then return all visual artifacts needed by the dashboard.
     session_id = None
 
     try:
@@ -2011,6 +2037,7 @@ def diffusion_register_images():
         if isinstance(extractors, str):
             extractors = extractors.split()
         match_preprocess = str(data.get("match_preprocess", DIFFUSION_DEFAULT_MATCH_PREPROCESS))
+        resize_mode = str(data.get("resize_mode", DIFFUSION_DEFAULT_RESIZE_MODE))
 
         if not session_id:
             return jsonify({"error": "缺少 session_id"}), 400
@@ -2040,6 +2067,7 @@ def diffusion_register_images():
             extractor_policy=extractor_policy,
             extractors=extractors,
             match_preprocess=match_preprocess,
+            resize_mode=resize_mode,
         )
 
         metrics = result_payload["metrics"]
@@ -2091,10 +2119,26 @@ def diffusion_register_images():
                 },
                 "timings": timings,
                 "model_info": model_info,
-                "checkerboard_url": f"/api/results/{session_id}/checkerboard.png",
-                "overlay_url": f"/api/results/{session_id}/false_color_overlay.png",
-                "difference_url": f"/api/results/{session_id}/difference_map.png",
-                "contour_url": f"/api/results/{session_id}/contour_overlay.png",
+                "checkerboard_url": (
+                    f"/api/results/{session_id}/checkerboard_original.png"
+                    if (result_dir / "checkerboard_original.png").exists()
+                    else f"/api/results/{session_id}/checkerboard.png"
+                ),
+                "overlay_url": (
+                    f"/api/results/{session_id}/false_color_overlay_original.png"
+                    if (result_dir / "false_color_overlay_original.png").exists()
+                    else f"/api/results/{session_id}/false_color_overlay.png"
+                ),
+                "difference_url": (
+                    f"/api/results/{session_id}/difference_map_original.png"
+                    if (result_dir / "difference_map_original.png").exists()
+                    else f"/api/results/{session_id}/difference_map.png"
+                ),
+                "contour_url": (
+                    f"/api/results/{session_id}/contour_overlay_original.png"
+                    if (result_dir / "contour_overlay_original.png").exists()
+                    else f"/api/results/{session_id}/contour_overlay.png"
+                ),
                 "fake_optical_url": f"/api/results/{session_id}/fake_optical.png",
                 "sar_condition_url": f"/api/results/{session_id}/sar_condition.png",
                 "real_optical_url": f"/api/results/{session_id}/real_optical_resized.png",
@@ -2102,9 +2146,21 @@ def diffusion_register_images():
                 "sar_transfer_match_url": f"/api/results/{session_id}/sar_transferred_matches.png",
                 "optical_points_url": f"/api/results/{session_id}/optical_transferred_points.png",
                 "fake_registered_url": f"/api/results/{session_id}/fake_optical_registered.png",
-                "sar_registered_url": f"/api/results/{session_id}/sar_registered.png",
-                "registered_preview_url": f"/api/results/{session_id}/sar_registered.png",
-                "registered_url": f"/api/download/{session_id}/registered_output.png",
+                "sar_registered_url": (
+                    f"/api/results/{session_id}/sar_registered_original.png"
+                    if (result_dir / "sar_registered_original.png").exists()
+                    else f"/api/results/{session_id}/sar_registered.png"
+                ),
+                "registered_preview_url": (
+                    f"/api/results/{session_id}/sar_registered_original.png"
+                    if (result_dir / "sar_registered_original.png").exists()
+                    else f"/api/results/{session_id}/sar_registered.png"
+                ),
+                "registered_url": (
+                    f"/api/download/{session_id}/registered_output_original.png"
+                    if (result_dir / "registered_output_original.png").exists()
+                    else f"/api/download/{session_id}/registered_output.png"
+                ),
                 "log_entry": log_entry,
             }
         )

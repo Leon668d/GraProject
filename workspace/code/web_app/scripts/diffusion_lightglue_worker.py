@@ -34,11 +34,15 @@ from models import SAR2OptUNetv3  # noqa: E402
 from lightglue import ALIKED, DISK, LightGlue, SuperPoint  # noqa: E402
 from lightglue.utils import load_image, rbd  # noqa: E402
 
+MODEL_SIZE = 256
+
 
 def now_ms(start: float) -> float:
     return round((time.perf_counter() - start) * 1000, 2)
 
 
+# 生成器权重以 safetensors 形式保存，因此这里显式读取权重文件，
+# 这样后续推理流程只依赖 PyTorch 张量，不依赖训练时的额外封装。
 def safe_load(model_path: Path) -> dict:
     state_dict = {}
     with safe_open(str(model_path), framework="pt", device="cpu") as handle:
@@ -47,6 +51,8 @@ def safe_load(model_path: Path) -> dict:
     return state_dict
 
 
+# 这里构建的是扩散生成器的固定网络结构，必须与预训练 ACD 权重严格一致；
+# Web 端只负责推理，不在运行时动态改网络配置。
 def build_model() -> SAR2OptUNetv3:
     return SAR2OptUNetv3(
         sample_size=256,
@@ -87,6 +93,8 @@ def resolve_checkpoint(path: Path) -> Path:
     raise FileNotFoundError(f"No generator checkpoint found at {path}")
 
 
+# 所有输入影像都会先压到统一的 8-bit 可视化空间，
+# 这样 tif/npy 等不同来源的数据都能走同一套预处理、推理和网页展示流程。
 def normalize_to_uint8(array: np.ndarray, *, log_sar: bool = False) -> np.ndarray:
     data = np.asarray(array)
     if data.ndim == 3 and data.shape[0] <= 8 and data.shape[0] < data.shape[-1]:
@@ -111,6 +119,8 @@ def normalize_to_uint8(array: np.ndarray, *, log_sar: bool = False) -> np.ndarra
     return np.clip(scaled * 255.0, 0, 255).astype(np.uint8)
 
 
+# 这个辅助函数屏蔽 tif/png/jpg/npy 之间的格式差异，
+# 始终返回下游 transforms 期望的 PIL 图像格式。
 def read_any_image(path: Path, *, mode: str, log_sar: bool = False) -> Image.Image:
     if path.suffix.lower() == ".npy":
         array = np.load(path)
@@ -152,6 +162,80 @@ def tensor_to_rgb_uint8(tensor: torch.Tensor) -> np.ndarray:
     return np.clip(image * 255.0, 0, 255).astype(np.uint8)
 
 
+def transform_matrix(meta: dict) -> np.ndarray:
+    return np.array(
+        [
+            [float(meta["scale_x"]), 0.0, float(meta["pad_x"])],
+            [0.0, float(meta["scale_y"]), float(meta["pad_y"])],
+            [0.0, 0.0, 1.0],
+        ],
+        dtype=np.float64,
+    )
+
+
+def stretch_image(image: Image.Image, *, size: int, mode: str) -> tuple[Image.Image, dict]:
+    width, height = image.size
+    resized = image.resize((size, size), Image.BILINEAR).convert(mode)
+    meta = {
+        "mode": "stretch",
+        "original_width": width,
+        "original_height": height,
+        "canvas_width": size,
+        "canvas_height": size,
+        "scale_x": size / max(float(width), 1.0),
+        "scale_y": size / max(float(height), 1.0),
+        "pad_x": 0.0,
+        "pad_y": 0.0,
+        "content_box": [0.0, 0.0, float(size), float(size)],
+    }
+    return resized, meta
+
+
+def letterbox_image(
+    image: Image.Image,
+    *,
+    size: int,
+    mode: str,
+    fill: int | tuple[int, int, int] = 0,
+) -> tuple[Image.Image, dict]:
+    width, height = image.size
+    scale = min(size / max(float(width), 1.0), size / max(float(height), 1.0))
+    resized_width = max(1, min(size, int(round(width * scale))))
+    resized_height = max(1, min(size, int(round(height * scale))))
+    pad_x = (size - resized_width) // 2
+    pad_y = (size - resized_height) // 2
+    resized = image.resize((resized_width, resized_height), Image.BILINEAR).convert(mode)
+    canvas = Image.new(mode, (size, size), fill)
+    canvas.paste(resized, (pad_x, pad_y))
+    meta = {
+        "mode": "letterbox",
+        "original_width": width,
+        "original_height": height,
+        "canvas_width": size,
+        "canvas_height": size,
+        "scale_x": scale,
+        "scale_y": scale,
+        "pad_x": float(pad_x),
+        "pad_y": float(pad_y),
+        "content_box": [float(pad_x), float(pad_y), float(pad_x + resized_width), float(pad_y + resized_height)],
+    }
+    return canvas, meta
+
+
+def prepare_input_canvas(image: Image.Image, *, mode: str, resize_mode: str) -> tuple[Image.Image, dict]:
+    if resize_mode == "letterbox":
+        fill = (0, 0, 0) if mode == "RGB" else 0
+        return letterbox_image(image, size=MODEL_SIZE, mode=mode, fill=fill)
+    return stretch_image(image, size=MODEL_SIZE, mode=mode)
+
+
+def points_inside_content(points: np.ndarray, meta: dict) -> np.ndarray:
+    if not len(points):
+        return np.zeros((0,), dtype=bool)
+    x0, y0, x1, y1 = [float(value) for value in meta.get("content_box", [0.0, 0.0, MODEL_SIZE, MODEL_SIZE])]
+    return (points[:, 0] >= x0) & (points[:, 0] < x1) & (points[:, 1] >= y0) & (points[:, 1] < y1)
+
+
 def save_rgb(path: Path, image: np.ndarray) -> None:
     Image.fromarray(image.astype(np.uint8)).save(path)
 
@@ -176,7 +260,7 @@ def checkerboard(image_a: np.ndarray, image_b: np.ndarray, cells: int = 8) -> np
     return output
 
 
-def save_visualizations(registered: np.ndarray, optical: np.ndarray, result_dir: Path) -> dict:
+def save_visualizations(registered: np.ndarray, optical: np.ndarray, result_dir: Path, *, suffix: str = "") -> dict:
     result_dir.mkdir(parents=True, exist_ok=True)
     registered_gray = to_gray(registered)
     optical_gray = to_gray(optical)
@@ -196,10 +280,10 @@ def save_visualizations(registered: np.ndarray, optical: np.ndarray, result_dir:
     contour[optical_edges > 0] = np.array([30, 170, 105], dtype=np.uint8)
 
     paths = {
-        "checkerboard": result_dir / "checkerboard.png",
-        "overlay": result_dir / "false_color_overlay.png",
-        "difference": result_dir / "difference_map.png",
-        "contour": result_dir / "contour_overlay.png",
+        "checkerboard": result_dir / f"checkerboard{suffix}.png",
+        "overlay": result_dir / f"false_color_overlay{suffix}.png",
+        "difference": result_dir / f"difference_map{suffix}.png",
+        "contour": result_dir / f"contour_overlay{suffix}.png",
     }
     save_rgb(paths["checkerboard"], checkerboard(registered, optical))
     save_rgb(paths["overlay"], overlay)
@@ -267,9 +351,10 @@ def draw_points_on_image(
     save_rgb(output_path, canvas)
 
 
+# 第 1 阶段：利用预训练扩散模型把 SAR 翻译成 Fake Optical。
+# 输出图与 resize 后的 SAR 条件图保持像素对齐，后面才能把
+# Fake Optical 上的匹配点直接当作 SAR 坐标来复用。
 def run_generation(args, result_dir: Path, device: torch.device, dtype: torch.dtype) -> dict:
-    # Stage 1: translate SAR into a pixel-aligned Fake Optical image with the
-    # pretrained conditional diffusion generator.
     start = time.perf_counter()
     checkpoint_path = resolve_checkpoint(Path(args.checkpoint))
     model = build_model()
@@ -278,14 +363,12 @@ def run_generation(args, result_dir: Path, device: torch.device, dtype: torch.dt
 
     transform_sar = transforms.Compose(
         [
-            transforms.Resize((256, 256)),
             transforms.ToTensor(),
             transforms.Normalize((0.5,), (0.5,)),
         ]
     )
     transform_opt = transforms.Compose(
         [
-            transforms.Resize((256, 256)),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
         ]
@@ -293,15 +376,17 @@ def run_generation(args, result_dir: Path, device: torch.device, dtype: torch.dt
 
     sar_image = read_any_image(Path(args.sar), mode="L", log_sar=args.sar_log)
     optical_image = read_any_image(Path(args.optical), mode="RGB")
-    sar_tensor = transform_sar(sar_image).unsqueeze(0).to(device=device, dtype=dtype)
-    optical_tensor = transform_opt(optical_image).unsqueeze(0)
+    sar_canvas, sar_transform = prepare_input_canvas(sar_image, mode="L", resize_mode=args.resize_mode)
+    optical_canvas, optical_transform = prepare_input_canvas(optical_image, mode="RGB", resize_mode=args.resize_mode)
+    sar_tensor = transform_sar(sar_canvas).unsqueeze(0).to(device=device, dtype=dtype)
+    optical_tensor = transform_opt(optical_canvas).unsqueeze(0)
 
     scheduler = LCMScheduler(num_train_timesteps=1000)
     scheduler.set_timesteps(args.steps, device=device)
 
     generator = torch.Generator(device=device)
     generator.manual_seed(args.seed)
-    pred = torch.randn((1, 3, 256, 256), device=device, dtype=dtype, generator=generator)
+    pred = torch.randn((1, 3, MODEL_SIZE, MODEL_SIZE), device=device, dtype=dtype, generator=generator)
     denoised = None
     with torch.no_grad():
         for timestep in scheduler.timesteps:
@@ -312,9 +397,12 @@ def run_generation(args, result_dir: Path, device: torch.device, dtype: torch.dt
         raise RuntimeError("Diffusion scheduler produced no output")
 
     fake = tensor_to_rgb_uint8(denoised)
-    sar_np = np.asarray(sar_image.resize((256, 256), Image.BILINEAR).convert("L"))
+    sar_np = np.asarray(sar_canvas.convert("L"))
     sar_rgb = np.repeat(sar_np[..., None], 3, axis=2)
     optical_rgb = tensor_to_rgb_uint8(optical_tensor)
+    sar_original_np = np.asarray(sar_image.convert("L"))
+    sar_original_rgb = np.repeat(sar_original_np[..., None], 3, axis=2)
+    optical_original_rgb = np.asarray(optical_image.convert("RGB"))
 
     fake_path = result_dir / "fake_optical.png"
     sar_path = result_dir / "sar_condition.png"
@@ -327,6 +415,10 @@ def run_generation(args, result_dir: Path, device: torch.device, dtype: torch.dt
         "fake": fake,
         "sar": sar_rgb,
         "optical": optical_rgb,
+        "sar_original": sar_original_rgb,
+        "optical_original": optical_original_rgb,
+        "sar_transform": sar_transform,
+        "optical_transform": optical_transform,
         "paths": {
             "fake_optical": str(fake_path),
             "sar_condition": str(sar_path),
@@ -336,6 +428,8 @@ def run_generation(args, result_dir: Path, device: torch.device, dtype: torch.dt
     }
 
 
+# 这里把特征提取器做成可配置项，是因为实验里需要比较
+# 单一提取器和 SuperPoint -> ALIKED 级联两种策略。
 def build_extractor(name: str, max_keypoints: int):
     if name == "superpoint":
         return SuperPoint(max_num_keypoints=max_keypoints)
@@ -346,6 +440,8 @@ def build_extractor(name: str, max_keypoints: int):
     raise ValueError(f"Unsupported extractor: {name}")
 
 
+# 结构增强模式会压低 Fake Optical 的颜色和风格噪声，
+# 在 RGB 直接匹配不稳定时，突出边缘和几何结构。
 def enhance_structure(image: np.ndarray) -> np.ndarray:
     gray = to_gray(image)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -357,6 +453,8 @@ def enhance_structure(image: np.ndarray) -> np.ndarray:
     return np.repeat(enhanced[..., None], 3, axis=2).astype(np.uint8)
 
 
+# 匹配既可以直接在 RGB 图上做，也可以在结构增强图上做。
+# 这里选中的图像版本，也会直接用于后续匹配证据图的绘制。
 def prepare_match_images(args, fake: np.ndarray, optical: np.ndarray, result_dir: Path) -> dict:
     if args.match_preprocess == "rgb":
         return {
@@ -364,6 +462,8 @@ def prepare_match_images(args, fake: np.ndarray, optical: np.ndarray, result_dir
             "optical_path": result_dir / "real_optical_resized.png",
             "fake_display": fake,
             "optical_display": optical,
+            "fake_meta": args.sar_transform,
+            "optical_meta": args.optical_transform,
         }
 
     fake_structure = enhance_structure(fake)
@@ -377,9 +477,13 @@ def prepare_match_images(args, fake: np.ndarray, optical: np.ndarray, result_dir
         "optical_path": optical_path,
         "fake_display": fake_structure,
         "optical_display": optical_structure,
+        "fake_meta": args.sar_transform,
+        "optical_meta": args.optical_transform,
     }
 
 
+# 一个可用的单应矩阵不仅要有内点，还要求内点在空间上分布开。
+# 否则即使局部区域数值上看起来不错，整体 warp 仍然可能很差。
 def inlier_spatial_quality(
     points0: np.ndarray,
     points1: np.ndarray,
@@ -418,6 +522,8 @@ def inlier_spatial_quality(
     }
 
 
+# 即使内点数足够，估计出的变换仍可能不合理。
+# 这里额外检查面积变化和角点位移，提前拦截异常 Homography。
 def homography_shape_quality(
     homography: np.ndarray | None,
     shape: tuple[int, int, int],
@@ -449,6 +555,8 @@ def homography_shape_quality(
     }
 
 
+# 这是最终的质量门控，网页端和实验脚本都依赖这一步判断：
+# 当前配准结果应被视为“可信”，还是应进入复核。
 def evaluate_reliability(
     *,
     inliers: int,
@@ -473,6 +581,8 @@ def evaluate_reliability(
     return not reasons, reasons
 
 
+# 一个 candidate 就代表“一种提取器 + 一次 LightGlue 匹配 + 一次
+# Homography 估计”。级联模式本质上就是重复跑多个 candidate，再择优。
 def run_match_candidate(
     args,
     extractor_name: str,
@@ -502,6 +612,8 @@ def run_match_candidate(
             "metrics": {
                 "extractor": extractor_name,
                 "match_count": 0,
+                "raw_match_count": 0,
+                "padding_filtered_count": 0,
                 "inliers": 0,
                 "inlier_ratio": 0.0,
                 "mean_score": 0.0,
@@ -515,17 +627,32 @@ def run_match_candidate(
 
     matches = matches01["matches"]
     scores = matches01.get("scores")
-    match_count = int(matches.shape[0])
-    mean_score = float(scores.mean().detach().cpu()) if scores is not None and len(scores) > 0 else 0.0
+    raw_match_count = int(matches.shape[0])
 
     points0 = np.empty((0, 2), dtype=np.float32)
     points1 = np.empty((0, 2), dtype=np.float32)
+    score_values = np.empty((0,), dtype=np.float32)
     homography = None
     inlier_mask = None
     rmse = None
-    if match_count:
+    if raw_match_count:
         points0 = feats0["keypoints"][matches[..., 0]].detach().cpu().numpy().astype(np.float32)
         points1 = feats1["keypoints"][matches[..., 1]].detach().cpu().numpy().astype(np.float32)
+        if scores is not None and len(scores) > 0:
+            score_values = scores.detach().cpu().numpy().astype(np.float32)
+        if args.resize_mode == "letterbox":
+            valid_mask = points_inside_content(points0, match_inputs["fake_meta"]) & points_inside_content(
+                points1,
+                match_inputs["optical_meta"],
+            )
+            points0 = points0[valid_mask]
+            points1 = points1[valid_mask]
+            if len(score_values) == len(valid_mask):
+                score_values = score_values[valid_mask]
+
+    match_count = int(len(points0))
+    padding_filtered_count = raw_match_count - match_count
+    mean_score = float(score_values.mean()) if len(score_values) > 0 else 0.0
     if match_count >= 4:
         homography, mask = cv2.findHomography(points0, points1, cv2.USAC_MAGSAC, args.ransac_threshold)
         if homography is None:
@@ -578,6 +705,8 @@ def run_match_candidate(
         "metrics": {
             "extractor": extractor_name,
             "match_count": match_count,
+            "raw_match_count": raw_match_count,
+            "padding_filtered_count": padding_filtered_count,
             "matches_total": match_count,
             "matches_used": match_count,
             "correct_matches": inliers,
@@ -598,6 +727,8 @@ def run_match_candidate(
     }
 
 
+# 这里的排序策略是保守的：先保证“可信”优先于“不可信”，
+# 然后再比较内点数、内点率和 RMSE。
 def candidate_score(candidate: dict) -> tuple:
     metrics = candidate["metrics"]
     rmse = metrics.get("rmse")
@@ -617,6 +748,8 @@ def summarize_candidate(candidate: dict) -> dict:
         "elapsed_ms": candidate["elapsed_ms"],
         "error": candidate.get("error", ""),
         "match_count": metrics.get("match_count"),
+        "raw_match_count": metrics.get("raw_match_count"),
+        "padding_filtered_count": metrics.get("padding_filtered_count"),
         "inliers": metrics.get("inliers"),
         "inlier_ratio": metrics.get("inlier_ratio"),
         "rmse": metrics.get("rmse"),
@@ -627,10 +760,18 @@ def summarize_candidate(candidate: dict) -> dict:
     }
 
 
-def run_lightglue(args, fake: np.ndarray, sar: np.ndarray, optical: np.ndarray, result_dir: Path, device: torch.device) -> dict:
-    # Stage 2: match Fake Optical to real Optical, then apply the same geometry
-    # back to SAR because Fake Optical is generated in SAR pixel coordinates.
+# 第 2 阶段：先在 Fake Optical -> Real Optical 之间估计几何关系，
+# 再把选中的 Homography 迁移回 SAR，因为 Fake Optical 与 SAR
+# 共享同一个 resize 后的像素坐标系。
+def run_lightglue(args, generation: dict, result_dir: Path, device: torch.device) -> dict:
     start = time.perf_counter()
+    fake = generation["fake"]
+    sar = generation["sar"]
+    optical = generation["optical"]
+    sar_original = generation["sar_original"]
+    optical_original = generation["optical_original"]
+    args.sar_transform = generation["sar_transform"]
+    args.optical_transform = generation["optical_transform"]
     match_inputs = prepare_match_images(args, fake, optical, result_dir)
     extractor_names = args.extractors if args.extractor_policy == "cascade" else [args.extractor]
     candidates = []
@@ -647,6 +788,19 @@ def run_lightglue(args, fake: np.ndarray, sar: np.ndarray, optical: np.ndarray, 
     points1 = selected["points1"]
     inlier_mask = selected["inlier_mask"]
     homography = selected["homography"]
+    h_canvas = homography
+    h_original = None
+    if h_canvas is not None:
+        try:
+            h_original = np.linalg.inv(transform_matrix(generation["optical_transform"])) @ h_canvas @ transform_matrix(
+                generation["sar_transform"],
+            )
+            if abs(float(h_original[2, 2])) > 1e-12:
+                h_original = h_original / h_original[2, 2]
+            if not np.isfinite(h_original).all():
+                h_original = None
+        except np.linalg.LinAlgError:
+            h_original = None
 
     if homography is None:
         fake_registered = fake.copy()
@@ -680,6 +834,27 @@ def run_lightglue(args, fake: np.ndarray, sar: np.ndarray, optical: np.ndarray, 
     draw_matches(sar, optical, points0, points1, inlier_mask, sar_transfer_match_path)
     draw_points_on_image(optical, points1, inlier_mask, optical_points_path)
     visual = save_visualizations(sar_registered, optical, result_dir)
+    original_paths = {}
+    original_visual = None
+    if args.resize_mode == "letterbox" and h_original is not None:
+        sar_registered_original = cv2.warpPerspective(
+            sar_original,
+            h_original.astype(np.float32),
+            (optical_original.shape[1], optical_original.shape[0]),
+            flags=cv2.INTER_LINEAR,
+            borderMode=cv2.BORDER_REFLECT,
+        )
+        sar_registered_original_path = result_dir / "sar_registered_original.png"
+        download_original_path = result_dir / "registered_output_original.png"
+        save_rgb(sar_registered_original_path, sar_registered_original)
+        save_rgb(download_original_path, sar_registered_original)
+        original_visual = save_visualizations(sar_registered_original, optical_original, result_dir, suffix="_original")
+        original_paths = {
+            "sar_registered_original": str(sar_registered_original_path),
+            "registered_preview": str(sar_registered_original_path),
+            "download": str(download_original_path),
+            **original_visual["paths"],
+        }
 
     candidate_summaries = [summarize_candidate(candidate) for candidate in candidates]
     cascade_rescued = bool(
@@ -699,15 +874,26 @@ def run_lightglue(args, fake: np.ndarray, sar: np.ndarray, optical: np.ndarray, 
             "registered_preview": str(sar_registered_path),
             "download": str(download_path),
             **visual["paths"],
+            **original_paths,
         },
         "metrics": {
             "prediction_type": "sar_via_fakeoptical_lightglue_homography",
             **selected_metrics,
+            "resize_mode": args.resize_mode,
+            "coordinate_mode": (
+                "letterbox_with_original_backprojection"
+                if args.resize_mode == "letterbox" and h_original is not None
+                else ("letterbox_canvas_no_homography" if args.resize_mode == "letterbox" else "stretched_canvas")
+            ),
+            "h_matrix_canvas": np.round(h_canvas, 6).tolist() if h_canvas is not None else None,
+            "h_matrix_original": np.round(h_original, 6).tolist() if h_original is not None else None,
+            "sar_transform": generation["sar_transform"],
+            "optical_transform": generation["optical_transform"],
             "reliability_rule": "reliable iff inliers >= 8, inlier_ratio >= 0.25, rmse <= 5px, spatial coverage is sufficient, homography shape is plausible",
-            "difference_mean": visual["difference_mean"],
+            "difference_mean": original_visual["difference_mean"] if original_visual else visual["difference_mean"],
             "geometry_source": "Fake Optical -> Real Optical",
             "geometry_applied_to": "SAR -> Real Optical",
-            "point_transfer": "Fake Optical keypoints are reused as SAR coordinates because Fake Optical is generated pixel-aligned from the resized SAR condition.",
+            "point_transfer": "Fake Optical keypoints are reused as SAR coordinates in the 256x256 canvas; letterbox mode back-projects the selected homography to original image coordinates.",
             "max_keypoints": args.max_keypoints,
             "extractor": selected["extractor"],
             "selected_extractor": selected["extractor"],
@@ -720,8 +906,9 @@ def run_lightglue(args, fake: np.ndarray, sar: np.ndarray, optical: np.ndarray, 
     }
 
 
+# main 是一个很薄的推理入口：负责解析参数、执行生成、执行配准，
+# 最后把结果整理成单个 JSON，供 Flask 网页端读取。
 def main() -> None:
-    # CLI entry point used by the Flask app and by batch experiments.
     parser = argparse.ArgumentParser(description="Single-pair ACD_S2ODPM + LightGlue web worker.")
     parser.add_argument("--sar", required=True)
     parser.add_argument("--optical", required=True)
@@ -735,6 +922,7 @@ def main() -> None:
     parser.add_argument("--extractor-policy", default="single", choices=["single", "cascade"])
     parser.add_argument("--cascade-stop-on-reliable", action="store_true")
     parser.add_argument("--match-preprocess", default="rgb", choices=["rgb", "structure"])
+    parser.add_argument("--resize-mode", default="stretch", choices=["stretch", "letterbox"])
     parser.add_argument("--ransac-threshold", type=float, default=3.0)
     parser.add_argument("--min-spatial-coverage", type=float, default=0.015)
     parser.add_argument("--min-inlier-quadrants", type=int, default=2)
@@ -763,7 +951,7 @@ def main() -> None:
     dtype = torch.float16 if args.dtype == "fp16" and device.type == "cuda" else torch.float32
 
     generation = run_generation(args, result_dir, device, dtype)
-    lightglue = run_lightglue(args, generation["fake"], generation["sar"], generation["optical"], result_dir, device)
+    lightglue = run_lightglue(args, generation, result_dir, device)
 
     timings = {
         "generation_ms": generation["generation_ms"],
@@ -783,6 +971,7 @@ def main() -> None:
             "extractor_policy": args.extractor_policy,
             "extractors": args.extractors,
             "match_preprocess": args.match_preprocess,
+            "resize_mode": args.resize_mode,
         },
         "timings": timings,
         "metrics": {
