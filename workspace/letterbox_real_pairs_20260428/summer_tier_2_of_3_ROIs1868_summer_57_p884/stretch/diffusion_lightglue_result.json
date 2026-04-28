@@ -1,0 +1,209 @@
+{
+  "success": true,
+  "method": "diffusion_lightglue",
+  "model_info": {
+    "generator_checkpoint": "E:\\checkPoint\\checkPoint\\checkpoint-25001-lcm-adv\\model.safetensors",
+    "device": "cuda",
+    "dtype": "float16",
+    "steps": 8,
+    "max_keypoints": 2048,
+    "extractor": "superpoint",
+    "extractor_policy": "cascade",
+    "extractors": [
+      "superpoint",
+      "aliked"
+    ],
+    "match_preprocess": "rgb",
+    "resize_mode": "stretch"
+  },
+  "timings": {
+    "generation_ms": 1700.26,
+    "registration_ms": 964.6,
+    "total_ms": 2670.52
+  },
+  "metrics": {
+    "prediction_type": "sar_via_fakeoptical_lightglue_homography",
+    "extractor": "superpoint",
+    "match_count": 45,
+    "raw_match_count": 45,
+    "padding_filtered_count": 0,
+    "matches_total": 45,
+    "matches_used": 45,
+    "correct_matches": 11,
+    "inliers": 11,
+    "inlier_ratio": 0.2444,
+    "mean_score": 0.227936,
+    "rmse": 1.5848,
+    "registration_reliable": false,
+    "reliability_reasons": [
+      "inlier_ratio < 0.25",
+      "bad_homography_shape"
+    ],
+    "dx": 0.4308,
+    "dy": 58.165,
+    "h_matrix": [
+      [
+        0.019797,
+        0.010048,
+        0.430833
+      ],
+      [
+        -0.227703,
+        -0.003901,
+        58.164958
+      ],
+      [
+        -0.00358,
+        -0.000845,
+        1.0
+      ]
+    ],
+    "poor_spatial_coverage": false,
+    "bad_homography_shape": true,
+    "coverage0": 0.426942,
+    "coverage1": 0.462971,
+    "quadrants0": 3,
+    "quadrants1": 2,
+    "area_ratio": 0.057582,
+    "max_corner_shift_ratio": 1.112987,
+    "resize_mode": "stretch",
+    "coordinate_mode": "stretched_canvas",
+    "h_matrix_canvas": [
+      [
+        0.019797,
+        0.010048,
+        0.430833
+      ],
+      [
+        -0.227703,
+        -0.003901,
+        58.164958
+      ],
+      [
+        -0.00358,
+        -0.000845,
+        1.0
+      ]
+    ],
+    "h_matrix_original": [
+      [
+        0.019797,
+        0.010048,
+        0.430833
+      ],
+      [
+        -0.227703,
+        -0.003901,
+        58.164958
+      ],
+      [
+        -0.00358,
+        -0.000845,
+        1.0
+      ]
+    ],
+    "sar_transform": {
+      "mode": "stretch",
+      "original_width": 256,
+      "original_height": 256,
+      "canvas_width": 256,
+      "canvas_height": 256,
+      "scale_x": 1.0,
+      "scale_y": 1.0,
+      "pad_x": 0.0,
+      "pad_y": 0.0,
+      "content_box": [
+        0.0,
+        0.0,
+        256.0,
+        256.0
+      ]
+    },
+    "optical_transform": {
+      "mode": "stretch",
+      "original_width": 256,
+      "original_height": 256,
+      "canvas_width": 256,
+      "canvas_height": 256,
+      "scale_x": 1.0,
+      "scale_y": 1.0,
+      "pad_x": 0.0,
+      "pad_y": 0.0,
+      "content_box": [
+        0.0,
+        0.0,
+        256.0,
+        256.0
+      ]
+    },
+    "reliability_rule": "reliable iff inliers >= 8, inlier_ratio >= 0.25, rmse <= 5px, spatial coverage is sufficient, homography shape is plausible",
+    "difference_mean": 60.2913,
+    "geometry_source": "Fake Optical -> Real Optical",
+    "geometry_applied_to": "SAR -> Real Optical",
+    "point_transfer": "Fake Optical keypoints are reused as SAR coordinates in the 256x256 canvas; letterbox mode back-projects the selected homography to original image coordinates.",
+    "max_keypoints": 2048,
+    "selected_extractor": "superpoint",
+    "extractor_policy": "cascade",
+    "extractors_tried": [
+      "superpoint",
+      "aliked"
+    ],
+    "match_preprocess": "rgb",
+    "cascade_rescued": false,
+    "matcher_candidates": [
+      {
+        "extractor": "superpoint",
+        "elapsed_ms": 445.88,
+        "error": "",
+        "match_count": 45,
+        "raw_match_count": 45,
+        "padding_filtered_count": 0,
+        "inliers": 11,
+        "inlier_ratio": 0.2444,
+        "rmse": 1.5848,
+        "registration_reliable": false,
+        "reliability_reasons": [
+          "inlier_ratio < 0.25",
+          "bad_homography_shape"
+        ],
+        "poor_spatial_coverage": false,
+        "bad_homography_shape": true
+      },
+      {
+        "extractor": "aliked",
+        "elapsed_ms": 409.68,
+        "error": "",
+        "match_count": 26,
+        "raw_match_count": 26,
+        "padding_filtered_count": 0,
+        "inliers": 5,
+        "inlier_ratio": 0.1923,
+        "rmse": 0.5923,
+        "registration_reliable": false,
+        "reliability_reasons": [
+          "inliers < 8",
+          "inlier_ratio < 0.25"
+        ],
+        "poor_spatial_coverage": false,
+        "bad_homography_shape": false
+      }
+    ],
+    "generator_steps": 8
+  },
+  "artifacts": {
+    "fake_optical": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\fake_optical.png",
+    "sar_condition": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\sar_condition.png",
+    "real_optical": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\real_optical_resized.png",
+    "matches": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\lightglue_matches.png",
+    "sar_transferred_matches": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\sar_transferred_matches.png",
+    "optical_transferred_points": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\optical_transferred_points.png",
+    "fake_registered": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\fake_optical_registered.png",
+    "sar_registered": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\sar_registered.png",
+    "registered_preview": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\sar_registered.png",
+    "download": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\registered_output.png",
+    "checkerboard": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\checkerboard.png",
+    "overlay": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\false_color_overlay.png",
+    "difference": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\difference_map.png",
+    "contour": "C:\\Users\\86158\\Desktop\\codxRoot\\workspace\\letterbox_real_pairs_20260428\\summer_tier_2_of_3_ROIs1868_summer_57_p884\\stretch\\contour_overlay.png"
+  }
+}
