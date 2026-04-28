@@ -14,3 +14,7 @@
 | success_summer_aspect | success_aspect | aspect_stress | letterbox | False | superpoint | 28 | 0 | 10 | 0.3571 | 1.2905 | True | letterbox_with_original_backprojection |
 | boundary_winter_aspect | boundary_aspect | aspect_stress | stretch | False | aliked | 23 | 0 | 6 | 0.2609 | 0.3686 | True | stretched_canvas |
 | boundary_winter_aspect | boundary_aspect | aspect_stress | letterbox | True | superpoint | 17 | 1 | 9 | 0.5294 | 1.7764 | False | letterbox_with_original_backprojection |
+| success_summer_crop | success_crop | crop_stress | stretch | False | aliked | 50 | 0 | 11 | 0.22 | 1.4705 | False | stretched_canvas |
+| success_summer_crop | success_crop | crop_stress | letterbox | False | aliked | 47 | 0 | 11 | 0.234 | 1.583 | False | letterbox_with_original_backprojection |
+| boundary_winter_crop | boundary_crop | crop_stress | stretch | False | superpoint | 22 | 0 | 7 | 0.3182 | 1.5348 | True | stretched_canvas |
+| boundary_winter_crop | boundary_crop | crop_stress | letterbox | True | superpoint | 27 | 0 | 13 | 0.4815 | 1.5645 | False | letterbox_with_original_backprojection |
