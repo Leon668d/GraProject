@@ -1729,6 +1729,14 @@ def dashboard():
     return render_template("dashboard.html", current_user=current_user)
 
 
+@app.route("/explain")
+def explain_page():
+    current_user = get_current_user()
+    if current_user is None:
+        return redirect(url_for("login_page"))
+    return render_template("explain.html", current_user=current_user)
+
+
 @app.route("/history/task/<session_id>")
 def task_detail_page(session_id: str):
     current_user = get_current_user()

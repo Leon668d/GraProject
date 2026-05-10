@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作量说明 | SAR-光学图像配准系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_console.css') }}">
+</head>
+<body class="dashboard-body research-console-body explain-page" data-username="{{ current_user.username }}">
+    <div class="dashboard-shell research-console-shell explain-shell">
+        <header class="topbar research-topbar explain-topbar">
+            <div class="hero-title-block">
+                <p class="eyebrow">Thesis Work Evidence</p>
+                <h1>跨模态配准毕业设计工作量说明</h1>
+                <p class="hero-subtitle">
+                    本页集中展示系统路线、实验验证和工程落地证据，用于答辩现场说明与 PPT 截图。
+                </p>
+            </div>
+            <div class="topbar-actions">
+                <a class="ghost-button explain-back-link" href="{{ url_for('dashboard') }}">返回实验控制台</a>
+            </div>
+        </header>
+
+        <nav class="dashboard-nav explain-nav" aria-label="explain sections">
+            <a href="#research-goal">研究目标</a>
+            <a href="#method-chain">方法链路</a>
+            <a href="#work-evidence">实验工作量</a>
+            <a href="#key-results">关键结论</a>
+            <a href="#delivery">系统落地</a>
+        </nav>
+
+        <main class="explain-main">
+            <section id="research-goal" class="explain-section explain-hero-grid">
+                <div>
+                    <span class="section-kicker">Problem</span>
+                    <h2>SAR 与光学图像直接匹配困难</h2>
+                    <p>
+                        SAR 与光学图像的成像机理差异明显，同一地物在两种模态下的纹理、亮度和边缘响应并不一致。
+                        本系统采用 Fake Optical 作为中间域，把跨模态配准问题转化为更接近光学图像之间的匹配问题。
+                    </p>
+                </div>
+                <div class="explain-stats-grid">
+                    <article>
+                        <span>数据样本池</span>
+                        <strong>6157 -> 4042</strong>
+                        <p>剔除海洋、水体、低纹理和近似空白样本。</p>
+                    </article>
+                    <article>
+                        <span>默认推理参数</span>
+                        <strong>8 steps / 2048 kp</strong>
+                        <p>在效率与配准稳定性之间选择的默认配置。</p>
+                    </article>
+                </div>
+            </section>
+
+            <section id="method-chain" class="explain-section">
+                <span class="section-kicker">Pipeline</span>
+                <h2>完整方法链路</h2>
+                <div class="explain-flow">
+                    <article>
+                        <span>01</span>
+                        <strong>SAR 输入</strong>
+                        <p>上传或选择 Sentinel-1 SAR 图像。</p>
+                    </article>
+                    <article>
+                        <span>02</span>
+                        <strong>扩散生成</strong>
+                        <p>预训练生成器输出 Fake Optical。</p>
+                    </article>
+                    <article>
+                        <span>03</span>
+                        <strong>级联匹配</strong>
+                        <p>SuperPoint 优先，ALIKED 作为补充。</p>
+                    </article>
+                    <article>
+                        <span>04</span>
+                        <strong>几何门控</strong>
+                        <p>按内点、RMSE、空间覆盖和单应矩阵形状复核。</p>
+                    </article>
+                    <article>
+                        <span>05</span>
+                        <strong>SAR 配准</strong>
+                        <p>把匹配得到的几何关系迁移回 SAR。</p>
+                    </article>
+                </div>
+            </section>
+
+            <section id="work-evidence" class="explain-section">
+                <span class="section-kicker">Experiments</span>
+                <h2>实验工作量证据</h2>
+                <div class="evidence-card-grid">
+                    <article>
+                        <h3>样本质量过滤</h3>
+                        <p>使用光学边缘强度、灰度标准差、水体占比代理量和 SAR 纹理指标过滤低价值场景。</p>
+                        <strong>保留 4042 / 6157 对</strong>
+                    </article>
+                    <article>
+                        <h3>参数搜索</h3>
+                        <p>比较扩散步数与关键点数量，固定同一批样本，减少样本差异带来的误判。</p>
+                        <strong>默认 8 steps / 2048 kp</strong>
+                    </article>
+                    <article>
+                        <h3>匹配器对比</h3>
+                        <p>比较 SuperPoint、ALIKED、DISK，并最终采用 SuperPoint -> ALIKED 级联策略。</p>
+                        <strong>级联策略约 45%</strong>
+                    </article>
+                    <article>
+                        <h3>尺度补充验证</h3>
+                        <p>在真实非方形样本上比较 stretch 与 letterbox，验证比例失真处理的工程价值。</p>
+                        <strong>letterbox 3/12 vs stretch 2/12</strong>
+                    </article>
+                </div>
+            </section>
+
+            <section id="key-results" class="explain-section explain-results-grid">
+                <div>
+                    <span class="section-kicker">Default Strategy</span>
+                    <h2>主实验策略</h2>
+                    <table class="explain-table">
+                        <tbody>
+                            <tr>
+                                <th>生成器</th>
+                                <td>checkpoint-25001-lcm-adv</td>
+                            </tr>
+                            <tr>
+                                <th>扩散步数</th>
+                                <td>8 steps</td>
+                            </tr>
+                            <tr>
+                                <th>关键点上限</th>
+                                <td>2048</td>
+                            </tr>
+                            <tr>
+                                <th>匹配策略</th>
+                                <td>SuperPoint -> ALIKED + LightGlue</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <span class="section-kicker">Supplement</span>
+                    <h2>真实非方形样本补充验证</h2>
+                    <table class="explain-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>输入</th>
+                                <th>方式</th>
+                                <th>成功率</th>
+                                <th>平均内点率</th>
+                                <th>RMSE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>方形</td>
+                                <td>stretch</td>
+                                <td>41.67%</td>
+                                <td>0.2966</td>
+                                <td>1.4538</td>
+                            </tr>
+                            <tr>
+                                <td>方形</td>
+                                <td>letterbox</td>
+                                <td>41.67%</td>
+                                <td>0.2966</td>
+                                <td>1.4538</td>
+                            </tr>
+                            <tr>
+                                <td>非方形</td>
+                                <td>stretch</td>
+                                <td>16.67%</td>
+                                <td>0.3150</td>
+                                <td>1.2883</td>
+                            </tr>
+                            <tr>
+                                <td>非方形</td>
+                                <td>letterbox</td>
+                                <td>25.00%</td>
+                                <td>0.4069</td>
+                                <td>1.1156</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="explain-note">
+                        该结果作为补充验证使用，说明 letterbox 对非方形输入有正向趋势，但不作为主方法结论。
+                    </p>
+                </div>
+            </section>
+
+            <section id="delivery" class="explain-section">
+                <span class="section-kicker">Delivery</span>
+                <h2>系统落地与交付</h2>
+                <div class="delivery-grid">
+                    <article>
+                        <h3>Web 推理控制台</h3>
+                        <p>支持上传 SAR/Optical、选择推理参数、执行扩散生成与 LightGlue 配准。</p>
+                    </article>
+                    <article>
+                        <h3>内置答辩样例</h3>
+                        <p>预置稳定样例、级联补救样例和边界复核样例，现场演示不依赖临时拖拽文件。</p>
+                    </article>
+                    <article>
+                        <h3>代码与讲解材料</h3>
+                        <p>交付包包含系统代码、实验结果、架构说明、代码讲解路线和导师问答文档。</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="screenshot-summary" aria-label="summary for screenshot">
+                <article>
+                    <span>过滤样本池</span>
+                    <strong>6157 -> 4042</strong>
+                </article>
+                <article>
+                    <span>默认配置</span>
+                    <strong>8 steps / 2048 kp</strong>
+                </article>
+                <article>
+                    <span>级联策略</span>
+                    <strong>SuperPoint -> ALIKED</strong>
+                </article>
+                <article>
+                    <span>非方形补充验证</span>
+                    <strong>3/12 vs 2/12</strong>
+                </article>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
