@@ -18,7 +18,7 @@ function sampleButton(sample) {
         <button class="demo-sample-button" type="button" data-demo-sample="${escapeHtml(sample.id)}">
             <span class="demo-sample-title">
                 ${escapeHtml(sample.title || sample.id)}
-                <span>${escapeHtml(sample.tag || "展示样例")}</span>
+                <span>${escapeHtml(sample.tag || "基准样例")}</span>
             </span>
             <span class="demo-sample-meta">
                 <span>${escapeHtml(sample.season || "--")}</span>
@@ -41,7 +41,7 @@ function renderDemoSamples(samples = []) {
 
     primaryContainer.innerHTML = primary.length
         ? primary.map(sampleButton).join("")
-        : '<div class="empty-block">暂无内置展示样例。</div>';
+        : '<div class="empty-block">暂无内置基准样例。</div>';
     reviewContainer.innerHTML = review.length
         ? review.map(sampleButton).join("")
         : '<div class="empty-block">暂无技术复核样例。</div>';
@@ -55,7 +55,7 @@ async function loadDemoSample(sampleId) {
     const demo = data.task?.demo || {};
     showTaskInResult(
         data.task,
-        `已加载内置样例：${demo.title || sampleId}。${demo.purpose || ""}`
+        `已加载基准样例：${demo.title || sampleId}。${demo.purpose || ""}`
     );
 }
 

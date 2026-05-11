@@ -3,8 +3,8 @@
         <p class="eyebrow">Diffusion Registration Research Console</p>
         <h1>扩散生成 + LightGlue 跨模态配准实验平台</h1>
         <p class="hero-subtitle">
-            面向答辩演示的跨模态配准控制台：SAR 生成 Fake Optical，LightGlue 估计几何关系，
-            再将 SAR 对齐到真实光学图像。
+            面向 SAR-光学跨模态配准实验，集成伪光学生成、特征匹配、几何验证和结果评估。
+            系统将 SAR 生成 Fake Optical，再利用 LightGlue 估计几何关系并完成 SAR 对齐。
         </p>
     </div>
     <div class="topbar-actions">
@@ -17,12 +17,12 @@
 </header>
 
 <nav class="dashboard-nav" aria-label="dashboard sections">
-    <a href="#quick-demo">快速演示</a>
+    <a href="#quick-demo">快速复现</a>
     <a href="#result-stage">推理结果</a>
     <a href="#match-evidence">匹配证据</a>
     <a href="#experiment-evidence">实验依据</a>
     <a href="#system-records">系统记录</a>
-    <a href="{{ url_for('explain_page') }}">说明页</a>
+    <a href="{{ url_for('explain_page') }}">研究概览</a>
 </nav>
 
 <section class="method-flow" aria-label="pipeline">

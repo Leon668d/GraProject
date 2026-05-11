@@ -133,7 +133,7 @@ export async function fetchRecentLogs() {
 export async function loadHistoryTask(sessionId) {
     try {
         const data = await requestJson(`/api/history/${sessionId}`);
-        showTaskInResult(data.task, `这里展示的是历史任务 ${data.task.created_at || ""} 的回看结果。`);
+        showTaskInResult(data.task, `当前为历史任务 ${data.task.created_at || ""} 的回看结果。`);
     } catch (error) {
         alert(`历史任务加载未完成：${error.message}`);
     }

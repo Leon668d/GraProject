@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工作量说明 | SAR-光学图像配准系统</title>
+    <title>研究概览 | SAR-光学图像配准系统</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_console.css') }}">
 </head>
@@ -11,10 +11,10 @@
     <div class="dashboard-shell research-console-shell explain-shell">
         <header class="topbar research-topbar explain-topbar">
             <div class="hero-title-block">
-                <p class="eyebrow">Thesis Work Evidence</p>
-                <h1>跨模态配准毕业设计工作量说明</h1>
+                <p class="eyebrow">Research Overview</p>
+                <h1>SAR-光学跨模态配准研究概览</h1>
                 <p class="hero-subtitle">
-                    本页集中展示系统路线、实验验证和工程落地证据，用于答辩现场说明与 PPT 截图。
+                    本页汇总方法路线、实验设计、指标结果和系统能力，用于复现实验流程与核查研究结论。
                 </p>
             </div>
             <div class="topbar-actions">
@@ -25,9 +25,9 @@
         <nav class="dashboard-nav explain-nav" aria-label="explain sections">
             <a href="#research-goal">研究目标</a>
             <a href="#method-chain">方法链路</a>
-            <a href="#work-evidence">实验工作量</a>
-            <a href="#key-results">关键结论</a>
-            <a href="#delivery">系统落地</a>
+            <a href="#work-evidence">实验设计</a>
+            <a href="#key-results">关键结果</a>
+            <a href="#delivery">系统能力</a>
         </nav>
 
         <main class="explain-main">
@@ -88,7 +88,7 @@
 
             <section id="work-evidence" class="explain-section">
                 <span class="section-kicker">Experiments</span>
-                <h2>实验工作量证据</h2>
+                <h2>研究流程与实验依据</h2>
                 <div class="evidence-card-grid">
                     <article>
                         <h3>样本质量过滤</h3>
@@ -190,24 +190,24 @@
 
             <section id="delivery" class="explain-section">
                 <span class="section-kicker">Delivery</span>
-                <h2>系统落地与交付</h2>
+                <h2>系统能力与交付内容</h2>
                 <div class="delivery-grid">
                     <article>
                         <h3>Web 推理控制台</h3>
                         <p>支持上传 SAR/Optical、选择推理参数、执行扩散生成与 LightGlue 配准。</p>
                     </article>
                     <article>
-                        <h3>内置答辩样例</h3>
-                        <p>预置稳定样例、级联补救样例和边界复核样例，现场演示不依赖临时拖拽文件。</p>
+                        <h3>内置基准样例</h3>
+                        <p>预置稳定样例、级联补救样例和边界复核样例，便于快速复现实验链路。</p>
                     </article>
                     <article>
-                        <h3>代码与讲解材料</h3>
-                        <p>交付包包含系统代码、实验结果、架构说明、代码讲解路线和导师问答文档。</p>
+                        <h3>代码与技术材料</h3>
+                        <p>交付包包含系统代码、实验结果、架构说明、模块说明路线和技术说明文档。</p>
                     </article>
                 </div>
             </section>
 
-            <section class="screenshot-summary" aria-label="summary for screenshot">
+            <section class="screenshot-summary" aria-label="research result summary">
                 <article>
                     <span>过滤样本池</span>
                     <strong>6157 -> 4042</strong>

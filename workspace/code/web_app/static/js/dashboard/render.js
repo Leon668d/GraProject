@@ -2,7 +2,7 @@ import { state } from "./state.js";
 import { escapeHtml, formatMapping, formatMilliseconds, formatValue } from "./utils.js";
 
 const RESULT_IMAGES = [
-    { key: "registered_preview", title: "SAR 配准后", caption: "最终展示图：将 SAR 按估计几何关系对齐到真实光学图。", id: "registered-preview-img" },
+    { key: "registered_preview", title: "SAR 配准后", caption: "最终结果图：将 SAR 按估计几何关系对齐到真实光学图。", id: "registered-preview-img" },
     { key: "checkerboard", title: "棋盘格对比", caption: "交替显示真实光学图与配准后的 SAR 图，用于观察边界对齐。", id: "checkerboard-img" },
     { key: "overlay", title: "伪彩色融合", caption: "融合图用于快速观察整体结构是否接近重合。", id: "overlay-img" },
     { key: "fake_optical", title: "Fake Optical", caption: "扩散模型从 SAR 生成的伪光学图，是跨模态匹配桥梁。", id: "fake-optical-img" },
@@ -149,7 +149,7 @@ function renderRegistrationQuality(metrics = {}) {
         `
         : `
             <strong>配准质量：待复核</strong>
-            <p>质量门控建议进一步复核，当前结果适合作为边界案例和诊断展示。</p>
+            <p>质量门控建议进一步复核，当前结果适合作为边界案例和诊断分析。</p>
             <div class="reason-chip-row">${reasonChips || "<span>needs_review</span>"}</div>
         `;
 }
@@ -222,7 +222,7 @@ function renderResultGallery(previewUrls = {}) {
                 <span>${escapeHtml(item.title)}</span>
             </button>
         `).join("")
-        : '<div class="image-placeholder inline-placeholder">暂无可展示图像</div>';
+        : '<div class="image-placeholder inline-placeholder">暂无可用图像</div>';
 
     if (available.length) {
         setFeaturedImage(available[0], previewUrls[available[0].key]);

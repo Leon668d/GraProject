@@ -87,7 +87,7 @@ function renderBadges(task) {
 
 function renderTask(task) {
     document.getElementById("detail-title").textContent = `${task.sar_name || "--"} / ${task.optical_name || "--"}`;
-    document.getElementById("detail-subtitle").textContent = `创建时间：${task.created_at || "--"}，以下为该历史配准任务的完整结果展示。`;
+    document.getElementById("detail-subtitle").textContent = `创建时间：${task.created_at || "--"}，以下为该历史配准任务的完整结果记录。`;
     document.getElementById("detail-download").href = task.preview_urls.download;
 
     renderBadges(task);

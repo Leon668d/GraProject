@@ -3,7 +3,7 @@
         <div>
             <p class="eyebrow">Execution & Quality Gate</p>
             <h2>配准结果</h2>
-            <p id="result-context">已内置稳定样例。也可以上传自定义图像，执行扩散生成与 LightGlue 配准。</p>
+            <p id="result-context">已加载基准样例。也可以上传自定义图像，执行扩散生成与 LightGlue 配准。</p>
         </div>
         <div class="quality-thresholds">
             <span>inliers >= 8</span>
@@ -18,8 +18,8 @@
     </div>
 
     <div id="demo-empty-state" class="demo-empty-state">
-        <strong>正在加载默认演示样例</strong>
-        <p>页面会优先展示一组已生成的稳定结果，不依赖 GPU 推理，适合现场讲解。</p>
+        <strong>正在加载默认基准样例</strong>
+        <p>页面会优先加载一组已生成的稳定结果，不依赖 GPU 推理，可用于快速复现实验链路。</p>
     </div>
 
     <div id="results" class="results-stack hidden">
@@ -43,7 +43,7 @@
                 <div class="featured-image-head">
                     <div>
                         <h3 id="featured-title">SAR 配准后</h3>
-                        <p id="featured-caption">主图展示当前最关键的配准结果，可点击放大查看。</p>
+                        <p id="featured-caption">主图呈现当前最关键的配准结果，可点击放大查看。</p>
                     </div>
                     <span class="viewer-hint">点击图片放大</span>
                 </div>
@@ -142,7 +142,7 @@
             </div>
             <div class="evidence-note">
                 <strong>结果解释</strong>
-                <p>Fake Optical 只作为跨模态桥梁。最终需要的是 SAR 到真实光学的配准，所以页面同时展示 Fake 上的匹配证据和 SAR 上的点迁移结果。</p>
+                <p>Fake Optical 只作为跨模态桥梁。最终需要的是 SAR 到真实光学的配准，所以页面同时呈现 Fake 上的匹配证据和 SAR 上的点迁移结果。</p>
             </div>
         </section>
 
